@@ -19,13 +19,16 @@ from sklearn.ensemble import GradientBoostingClassifier
 from sklearn.metrics import precision_score, recall_score, f1_score
 
 features = df_train.columns.tolist()
+df_train.drop([features[2], features[4], features[5], features[6], features[8], features[10]], axis = 1, inplace = True)
 
-X_train, X_valid, y_train, y_valid = train_test_split(df_train[features[1:]], df_train['target'], random_state = 0)
+X_train, X_valid, y_train, y_valid = train_test_split(np.array(df_train[df_train.columns[1:]]),
+                                                      np.array(df_train['target']), random_state = 0)
 
-clf = GradientBoostingClassifier(random_state = 0)
+clf = GradientBoostingClassifier(learning_rate = 1, max_depth = 3, n_estimators = 300, random_state = 0)
 clf.fit(X_train, y_train)
 
 pickle.dump(clf, open('model.pkl','wb'))
 
 model = pickle.load(open('model.pkl','rb'))
-print(model.predict([[0.766127, 45, 2, 0.802982, 9120, 13, 0, 6, 0, 2]]))
+probability = model.predict_proba(np.array([[0.766, 2, 0, 0]]))[:, 1]
+print(probability)
